@@ -1,0 +1,20 @@
+{
+  "name": "face-recognition-worker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create face-recognition-db",
+    "db:migrate": "wrangler d1 execute face-recognition-db --file=./schema.sql",
+    "db:backup": "wrangler d1 backup face-recognition-db"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "description": "Sistem antrian cerdas yang menggunakan teknologi **face recognition** untuk mengidentifikasi pengunjung secara otomatis. Sistem ini dilengkapi dengan simulasi jumlah loket, tiket, pengunjung, dan waktu pelayanan.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,29 +1,128 @@
 <!doctype html>
 <html lang="id">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Face Recognition + Wemos API</title>
-<style>
-  :root{--bg:#0f1720;--panel:#0b1220;--text:#e6eef6;--muted:#8fa4bf;--btn:#2b6cb0;--btn2:#334155;--border:#1b2b48}
-  *{box-sizing:border-box}
-  body{margin:16px;background:var(--bg);color:var(--text);font:14px/1.55 system-ui,Segoe UI,Roboto,Arial}
-  .card{max-width:1000px;margin:auto;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 10px 24px rgba(0,0,0,.5)}
-  h2{margin:0 0 10px}
-  .muted{color:var(--muted)}
-  label{display:block;margin:.5rem 0 .2rem;color:#9fb0c9}
-  input,select{width:100%;padding:8px;border-radius:8px;border:1px solid #20314a;background:#071623;color:#dfeefc}
-  button{padding:8px 12px;border:0;border-radius:10px;background:var(--btn);color:#fff;cursor:pointer}
-  button.secondary{background:var(--btn2)}
-  button:disabled{opacity:.6;cursor:not-allowed}
-  .grid{display:grid;grid-template-columns:1fr 140px 140px 220px;gap:10px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
-  #canvas{width:100%;max-width:1000px;border-radius:10px;background:#000;display:block}
-  #video{width:100%;max-width:1000px;border-radius:10px;margin:8px 0;display:none;opacity:.7}
-  .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#1a2a44;margin-left:6px}
-  pre{white-space:pre-wrap}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Face Recognition + Wemos API</title>
+  <style>
+    :root {
+      --bg: #0f1720;
+      --panel: #0b1220;
+      --text: #e6eef6;
+      --muted: #8fa4bf;
+      --btn: #2b6cb0;
+      --btn2: #334155;
+      --border: #1b2b48
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.55 system-ui, Segoe UI, Roboto, Arial
+    }
+
+    .card {
+      max-width: 1000px;
+      margin: auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .5)
+    }
+
+    h2 {
+      margin: 0 0 10px
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    label {
+      display: block;
+      margin: .5rem 0 .2rem;
+      color: #9fb0c9
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #20314a;
+      background: #071623;
+      color: #dfeefc
+    }
+
+    button {
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--btn);
+      color: #fff;
+      cursor: pointer
+    }
+
+    button.secondary {
+      background: var(--btn2)
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 140px 140px 220px;
+      gap: 10px
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: end
+    }
+
+    #canvas {
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 10px;
+      background: #000;
+      display: block
+    }
+
+    #video {
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 10px;
+      margin: 8px 0;
+      display: none;
+      opacity: .7
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #1a2a44;
+      margin-left: 6px
+    }
+
+    pre {
+      white-space: pre-wrap
+    }
+  </style>
 </head>
+
 <body>
   <div class="card">
     <h2>Face Recognition — OpenCV.js + Wemos API <span class="pill">LBP + Cosine</span></h2>
@@ -67,7 +166,12 @@
       </div>
       <div>
         <label>Sample</label>
-        <select id="samples"><option>10</option><option>15</option><option selected>20</option><option>30</option></select>
+        <select id="samples">
+          <option>10</option>
+          <option>15</option>
+          <option selected>20</option>
+          <option>30</option>
+        </select>
       </div>
       <div>
         <label>Threshold cosine</label>
@@ -77,7 +181,8 @@
         <button id="enroll" class="secondary" disabled>Enroll</button>
         <button id="clearDb" class="secondary">Clear DB</button>
         <button id="exportDb" class="secondary">Export</button>
-        <label class="secondary" style="padding:8px 12px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:#334155">
+        <label class="secondary"
+          style="padding:8px 12px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:#334155">
           Import<input id="importDb" type="file" accept="application/json" style="display:none">
         </label>
       </div>
@@ -106,180 +211,284 @@
       </div>
     </div>
 
+    <!-- ===== CLOUDFLARE D1 SYNC ===== -->
+    <div class="row" style="margin-top:12px">
+      <div style="min-width:340px">
+        <label>Cloudflare Worker URL</label>
+        <input id="workerUrl" placeholder="https://your-worker.workers.dev/users" value="">
+      </div>
+      <div style="min-width:200px">
+        <label>Worker API Key</label>
+        <input id="workerKey" placeholder="API Key" value="">
+      </div>
+      <div class="row">
+        <button id="syncUpload" class="secondary">↑ Upload to Cloud</button>
+        <button id="syncDownload" class="secondary">↓ Download from Cloud</button>
+      </div>
+    </div>
+
     <p class="muted" id="status">Status: memuat OpenCV (WASM)…</p>
     <video id="video" playsinline autoplay muted></video>
     <canvas id="canvas" width="640" height="480"></canvas>
-    <p class="muted" style="margin-top:8px">Tips: enroll di pencahayaan baik, beberapa pose ringan. Pastikan Wemos & laptop 1 jaringan.</p>
+    <p class="muted" style="margin-top:8px">Tips: enroll di pencahayaan baik, beberapa pose ringan. Pastikan Wemos &
+      laptop 1 jaringan.</p>
     <pre id="log" class="muted"></pre>
   </div>
 
   <!-- OpenCV.js -->
   <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady()"></script>
   <script>
-  // ===== DOM refs & util UI =====
-  const $ = (id)=>document.getElementById(id);
-  const camSel=$("camera"), nthEl=$("nth"), sizeEl=$("size"), btnS=$("start"), btnT=$("stop"), showVideoCb=$("showVideo");
-  const nameEl=$("name"), samplesEl=$("samples"), thEl=$("th"), btnEnroll=$("enroll"), btnClear=$("clearDb"), btnExport=$("exportDb"), inImport=$("importDb");
-  const espUrlEl=$("espUrl"), espKeyEl=$("espKey"), espOffEl=$("espOff"), btnTestOn=$("testOn"), btnTestOff=$("testOff"), autoTriggerEl=$("autoTrigger");
-  const statusEl=$("status"), logEl=$("log"), video=$("video"), canvas=$("canvas"), ctx=canvas.getContext('2d');
-  const log=(...a)=>{ console.log(...a); logEl.textContent=a.join(" ")+"\n"+logEl.textContent.slice(0,2000); };
+    // ===== DOM refs & util UI =====
+    const $ = (id) => document.getElementById(id);
+    const camSel = $("camera"), nthEl = $("nth"), sizeEl = $("size"), btnS = $("start"), btnT = $("stop"), showVideoCb = $("showVideo");
+    const nameEl = $("name"), samplesEl = $("samples"), thEl = $("th"), btnEnroll = $("enroll"), btnClear = $("clearDb"), btnExport = $("exportDb"), inImport = $("importDb");
+    const espUrlEl = $("espUrl"), espKeyEl = $("espKey"), espOffEl = $("espOff"), btnTestOn = $("testOn"), btnTestOff = $("testOff"), autoTriggerEl = $("autoTrigger");
+    const workerUrlEl = $("workerUrl"), workerKeyEl = $("workerKey"), btnSyncUpload = $("syncUpload"), btnSyncDownload = $("syncDownload");
+    const statusEl = $("status"), logEl = $("log"), video = $("video"), canvas = $("canvas"), ctx = canvas.getContext('2d');
+    const log = (...a) => { console.log(...a); logEl.textContent = a.join(" ") + "\n" + logEl.textContent.slice(0, 2000); };
 
-  // ===== RECOGNITION core (LBP + cosine) =====
-  let stream=null, running=false, rafId=null, enrolling=false, enrollLeft=0, enrollSum=null;
-  let detectEveryN=2, frameIndex=0, facesCount=0, procFPS=0, lastFPS=0, procCount=0;
-  let classifier=null, gray=null, rgba=null;
-  const cascadeURL='https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_alt2.xml';
-  const DB_KEY='face_db_v1';
-  const LBP_SIZE=100;
+    // ===== RECOGNITION core (LBP + cosine) =====
+    let stream = null, running = false, rafId = null, enrolling = false, enrollLeft = 0, enrollSum = null;
+    let detectEveryN = 2, frameIndex = 0, facesCount = 0, procFPS = 0, lastFPS = 0, procCount = 0;
+    let classifier = null, gray = null, rgba = null;
+    const cascadeURL = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_alt2.xml';
+    const DB_KEY = 'face_db_v1';
+    const LBP_SIZE = 100;
 
-  function loadDB(){ try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"labels":[]}');}catch{return {labels:[]};} }
-  function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-  function clearDB(){ localStorage.removeItem(DB_KEY); }
-  function bestMatch(vec, db){ if(!db.labels.length) return {name:"Unknown", score:0}; let best={name:"Unknown",score:0}; for(const r of db.labels){ const s=cosine(vec,r.vec); if(s>best.score) best={name:r.name,score:s}; } return best; }
-  function lbpHistFromBytes(bytes,w,h){ const hist=new Float32Array(256); for(let y=1;y<h-1;y++){const yp=y*w; for(let x=1;x<w-1;x++){const c=bytes[yp+x]; const code=((bytes[(y-1)*w+(x-1)]>=c)<<7)|((bytes[(y-1)*w+(x  )]>=c)<<6)|((bytes[(y-1)*w+(x+1)]>=c)<<5)|((bytes[(y  )*w+(x+1)]>=c)<<4)|((bytes[(y+1)*w+(x+1)]>=c)<<3)|((bytes[(y+1)*w+(x  )]>=c)<<2)|((bytes[(y+1)*w+(x-1)]>=c)<<1)|((bytes[(y  )*w+(x-1)]>=c)<<0); hist[code]+=1; }} let norm=0; for(let i=0;i<256;i++) norm+=hist[i]*hist[i]; norm=Math.sqrt(norm)||1; for(let i=0;i<256;i++) hist[i]/=norm; return hist; }
-  function addInPlace(a,b){ for(let i=0;i<a.length;i++) a[i]+=b[i]; }
-  function scaleInPlace(a,s){ for(let i=0;i<a.length;i++) a[i]*=s; }
-  function cosine(a,b){ let dot=0,na=0,nb=0; for(let i=0;i<a.length;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; } return dot/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+    function loadDB() { try { return JSON.parse(localStorage.getItem(DB_KEY) || '{"labels":[]}'); } catch { return { labels: [] }; } }
+    function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+    function clearDB() { localStorage.removeItem(DB_KEY); }
+    function bestMatch(vec, db) { if (!db.labels.length) return { name: "Unknown", score: 0 }; let best = { name: "Unknown", score: 0 }; for (const r of db.labels) { const s = cosine(vec, r.vec); if (s > best.score) best = { name: r.name, score: s }; } return best; }
+    function lbpHistFromBytes(bytes, w, h) { const hist = new Float32Array(256); for (let y = 1; y < h - 1; y++) { const yp = y * w; for (let x = 1; x < w - 1; x++) { const c = bytes[yp + x]; const code = ((bytes[(y - 1) * w + (x - 1)] >= c) << 7) | ((bytes[(y - 1) * w + (x)] >= c) << 6) | ((bytes[(y - 1) * w + (x + 1)] >= c) << 5) | ((bytes[(y) * w + (x + 1)] >= c) << 4) | ((bytes[(y + 1) * w + (x + 1)] >= c) << 3) | ((bytes[(y + 1) * w + (x)] >= c) << 2) | ((bytes[(y + 1) * w + (x - 1)] >= c) << 1) | ((bytes[(y) * w + (x - 1)] >= c) << 0); hist[code] += 1; } } let norm = 0; for (let i = 0; i < 256; i++)norm += hist[i] * hist[i]; norm = Math.sqrt(norm) || 1; for (let i = 0; i < 256; i++)hist[i] /= norm; return hist; }
+    function addInPlace(a, b) { for (let i = 0; i < a.length; i++)a[i] += b[i]; }
+    function scaleInPlace(a, s) { for (let i = 0; i < a.length; i++)a[i] *= s; }
+    function cosine(a, b) { let dot = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9); }
 
-  // ===== OpenCV init
-  function onOpenCvReady(){ if(window.cv&&cv.getBuildInformation) initOpenCV(); else if(window.cv) cv['onRuntimeInitialized']=initOpenCV; }
-  async function initOpenCV(){
-    try{
-      statusEl.textContent='Status: memuat cascade…';
-      const res=await fetch(cascadeURL); const buf=new Uint8Array(await res.arrayBuffer());
-      cv.FS_createDataFile('/','haarcascade.xml',buf,true,false,false);
-      classifier=new cv.CascadeClassifier(); classifier.load('haarcascade.xml');
-      statusEl.textContent='Status: siap. Klik Start.';
-      btnS.disabled=false; btnEnroll.disabled=false;
-      if(navigator.mediaDevices?.enumerateDevices){ try{ await fillCameraList(); }catch{} }
-    }catch(e){ log(e); statusEl.textContent='Status: gagal memuat cascade.'; }
-  }
+    // ===== OpenCV init
+    function onOpenCvReady() { if (window.cv && cv.getBuildInformation) initOpenCV(); else if (window.cv) cv['onRuntimeInitialized'] = initOpenCV; }
+    async function initOpenCV() {
+      try {
+        statusEl.textContent = 'Status: memuat cascade…';
+        const res = await fetch(cascadeURL); const buf = new Uint8Array(await res.arrayBuffer());
+        cv.FS_createDataFile('/', 'haarcascade.xml', buf, true, false, false);
+        classifier = new cv.CascadeClassifier(); classifier.load('haarcascade.xml');
+        statusEl.textContent = 'Status: siap. Klik Start.';
+        btnS.disabled = false; btnEnroll.disabled = false;
+        if (navigator.mediaDevices?.enumerateDevices) { try { await fillCameraList(); } catch { } }
+      } catch (e) { log(e); statusEl.textContent = 'Status: gagal memuat cascade.'; }
+    }
 
-  // ===== Camera
-  async function fillCameraList(){ const devices=await navigator.mediaDevices.enumerateDevices(); const cams=devices.filter(d=>d.kind==='videoinput'); camSel.innerHTML=''; cams.forEach((d,i)=>{const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||`Kamera ${i+1}`; camSel.appendChild(o);}); }
-  function parseSize(v){ const [w,h]=v.split('x').map(n=>parseInt(n,10)); return {w,h}; }
-  function setCanvasSize(v){ const {w,h}=parseSize(v); canvas.width=w; canvas.height=h; }
-  async function startCamera(){ const devId=camSel.value||undefined; const {w,h}=parseSize(sizeEl.value); const c={video:devId?{deviceId:{exact:devId},width:{ideal:w},height:{ideal:h}}:{width:{ideal:w},height:{ideal:h}},audio:false}; stream=await navigator.mediaDevices.getUserMedia(c); video.srcObject=stream; await video.play(); await new Promise(res=>{ const done=()=>res(); if(video.readyState>=2 && video.videoWidth>0) return res(); video.onloadedmetadata=done; video.onplaying=done; setTimeout(done,3000); }); if(navigator.mediaDevices?.enumerateDevices){ try{ await fillCameraList(); }catch{} } }
-  function stopCamera(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } video.srcObject=null; }
+    // ===== Camera
+    async function fillCameraList() { const devices = await navigator.mediaDevices.enumerateDevices(); const cams = devices.filter(d => d.kind === 'videoinput'); camSel.innerHTML = ''; cams.forEach((d, i) => { const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label || `Kamera ${i + 1}`; camSel.appendChild(o); }); }
+    function parseSize(v) { const [w, h] = v.split('x').map(n => parseInt(n, 10)); return { w, h }; }
+    function setCanvasSize(v) { const { w, h } = parseSize(v); canvas.width = w; canvas.height = h; }
+    async function startCamera() { const devId = camSel.value || undefined; const { w, h } = parseSize(sizeEl.value); const c = { video: devId ? { deviceId: { exact: devId }, width: { ideal: w }, height: { ideal: h } } : { width: { ideal: w }, height: { ideal: h } }, audio: false }; stream = await navigator.mediaDevices.getUserMedia(c); video.srcObject = stream; await video.play(); await new Promise(res => { const done = () => res(); if (video.readyState >= 2 && video.videoWidth > 0) return res(); video.onloadedmetadata = done; video.onplaying = done; setTimeout(done, 3000); }); if (navigator.mediaDevices?.enumerateDevices) { try { await fillCameraList(); } catch { } } }
+    function stopCamera() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } video.srcObject = null; }
 
-  // ===== Wemos Client
-  async function callLED(state){
-    const base=(espUrlEl.value||'').replace(/\/+$/,''); if(!base) return;
-    const key=espKeyEl.value||'';
-    try{
-      const r=await fetch(base+'/api/led', {
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-API-Key':key},
-        body:JSON.stringify({state})
-      });
-      const j=await r.json().catch(()=>({}));
-      log(`LED ${state}:`, r.status, j.message||'');
-    }catch(e){ log('LED call error:', e); }
-  }
+    // ===== Wemos Client
+    async function callLED(state) {
+      const base = (espUrlEl.value || '').replace(/\/+$/, ''); if (!base) return;
+      const key = espKeyEl.value || '';
+      try {
+        const r = await fetch(base + '/api/led', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+          body: JSON.stringify({ state })
+        });
+        const j = await r.json().catch(() => ({}));
+        log(`LED ${state}:`, r.status, j.message || '');
+      } catch (e) { log('LED call error:', e); }
+    }
 
-  // Debounce / cooldown biar nggak spam
-  let lastTrigger=0;
-  async function triggerOnVerified(){
-    const enable = autoTriggerEl.checked;
-    if(!enable) return;
-    const now=Date.now(); if(now - lastTrigger < 2000) return; // 2 detik cooldown
-    lastTrigger = now;
-    await callLED('on');
-    const offSec = Math.max(1, parseInt(espOffEl.value||'5', 10));
-    setTimeout(()=>callLED('off'), offSec*1000);
-  }
+    // Debounce / cooldown biar nggak spam
+    let lastTrigger = 0;
+    async function triggerOnVerified() {
+      const enable = autoTriggerEl.checked;
+      if (!enable) return;
+      const now = Date.now(); if (now - lastTrigger < 2000) return; // 2 detik cooldown
+      lastTrigger = now;
+      await callLED('on');
+      const offSec = Math.max(1, parseInt(espOffEl.value || '5', 10));
+      setTimeout(() => callLED('off'), offSec * 1000);
+    }
 
-  // ===== UI handlers
-  btnS.onclick = async ()=>{ if(!classifier){ alert('OpenCV belum siap.'); return; } detectEveryN=parseInt(nthEl.value,10)||2; setCanvasSize(sizeEl.value); await startCamera(); running=true; btnS.disabled=true; btnT.disabled=false; video.style.display = showVideoCb.checked?'block':'none'; startLoop(); statusEl.textContent='Status: kamera aktif'; };
-  btnT.onclick = ()=>{ running=false; cancelAnimationFrame(rafId); rafId=null; stopCamera(); btnS.disabled=false; btnT.disabled=true; statusEl.textContent='Status: stopped'; };
-  showVideoCb.onchange = ()=>{ video.style.display = showVideoCb.checked?'block':'none'; };
+    // ===== UI handlers
+    btnS.onclick = async () => { if (!classifier) { alert('OpenCV belum siap.'); return; } detectEveryN = parseInt(nthEl.value, 10) || 2; setCanvasSize(sizeEl.value); await startCamera(); running = true; btnS.disabled = true; btnT.disabled = false; video.style.display = showVideoCb.checked ? 'block' : 'none'; startLoop(); statusEl.textContent = 'Status: kamera aktif'; };
+    btnT.onclick = () => { running = false; cancelAnimationFrame(rafId); rafId = null; stopCamera(); btnS.disabled = false; btnT.disabled = true; statusEl.textContent = 'Status: stopped'; };
+    showVideoCb.onchange = () => { video.style.display = showVideoCb.checked ? 'block' : 'none'; };
 
-  btnEnroll.onclick = ()=>{ const nm=(nameEl.value||'').trim(); if(!nm){ alert('Isi nama.'); return; } enrolling=true; enrollLeft=parseInt(samplesEl.value,10)||20; enrollSum=new Float32Array(256); statusEl.textContent=`Enroll "${nm}" — ambil ${enrollLeft} sampel…`; };
-  btnClear.onclick = ()=>{ clearDB(); alert('DB cleared.'); };
-  btnExport.onclick = ()=>{ const blob=new Blob([JSON.stringify(loadDB(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='face_db.json'; a.click(); };
-  inImport.onchange = async e=>{ const f=e.target.files[0]; if(!f) return; const txt=await f.text(); try{ const obj=JSON.parse(txt); if(!obj||!Array.isArray(obj.labels)) throw 0; localStorage.setItem(DB_KEY, JSON.stringify(obj)); alert('Import ok.'); }catch{ alert('File JSON tidak valid.'); } };
+    btnEnroll.onclick = () => { const nm = (nameEl.value || '').trim(); if (!nm) { alert('Isi nama.'); return; } enrolling = true; enrollLeft = parseInt(samplesEl.value, 10) || 20; enrollSum = new Float32Array(256); statusEl.textContent = `Enroll "${nm}" — ambil ${enrollLeft} sampel…`; };
+    btnClear.onclick = () => { clearDB(); alert('DB cleared.'); };
+    btnExport.onclick = () => { const blob = new Blob([JSON.stringify(loadDB(), null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'face_db.json'; a.click(); };
+    inImport.onchange = async e => { const f = e.target.files[0]; if (!f) return; const txt = await f.text(); try { const obj = JSON.parse(txt); if (!obj || !Array.isArray(obj.labels)) throw 0; localStorage.setItem(DB_KEY, JSON.stringify(obj)); alert('Import ok.'); } catch { alert('File JSON tidak valid.'); } };
 
-  btnTestOn.onclick = ()=>callLED('on');
-  btnTestOff.onclick = ()=>callLED('off');
+    btnTestOn.onclick = () => callLED('on');
+    btnTestOff.onclick = () => callLED('off');
 
-  // ===== Main loop (detect+recognize+trigger)
-  function startLoop(){
-    rgba && rgba.delete(); gray && gray.delete();
-    rgba=new cv.Mat(canvas.height,canvas.width,cv.CV_8UC4);
-    gray=new cv.Mat();
-    const faces=new cv.RectVector();
-    procFPS=0; lastFPS=performance.now(); procCount=0; frameIndex=0;
+    // ===== Cloudflare D1 Sync
+    async function syncUploadToCloud() {
+      const baseUrl = (workerUrlEl.value || '').replace(/\/+$/, '');
+      const apiKey = workerKeyEl.value || '';
+      if (!baseUrl) { alert('Isi URL Worker terlebih dahulu.'); return; }
+      if (!apiKey) { alert('Isi API Key Worker terlebih dahulu.'); return; }
 
-    const step=()=>{
-      if(!running){ rgba.delete(); gray.delete(); faces.delete(); return; }
+      try {
+        const db = loadDB();
+        if (!db.labels || db.labels.length === 0) { alert('Database lokal kosong, tidak ada yang di-upload.'); return; }
 
-      if(video.readyState>=2 && video.videoWidth>0){
-        try{
-          ctx.drawImage(video,0,0,canvas.width,canvas.height);
-          frameIndex++;
-          if(frameIndex % detectEveryN === 0){
-            const data=ctx.getImageData(0,0,canvas.width,canvas.height);
-            rgba.data.set(data.data);
-            cv.cvtColor(rgba,gray,cv.COLOR_RGBA2GRAY);
-            cv.equalizeHist(gray,gray);
-            classifier.detectMultiScale(gray,faces,1.1,5,0,new cv.Size(60,60));
-            facesCount=faces.size();
+        log(`Uploading ${db.labels.length} user(s) to cloud...`);
+        let success = 0, failed = 0;
 
-            let displayText='';
-            if(faces.size()>0){
-              // pilih wajah terbesar
-              let bi=0, ba=0;
-              for(let i=0;i<faces.size();i++){ const r=faces.get(i), a=r.width*r.height; if(a>ba){ba=a; bi=i;} }
-              const r=faces.get(bi);
-              // ROI -> 100x100
-              let roi=gray.roi(r), res=new cv.Mat();
-              cv.resize(roi,res,new cv.Size(LBP_SIZE,LBP_SIZE),0,0,cv.INTER_AREA);
-              const desc=lbpHistFromBytes(res.data,res.cols,res.rows);
+        for (const label of db.labels) {
+          try {
+            const res = await fetch(`${baseUrl}?api_key=${encodeURIComponent(apiKey)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: label.name,
+                email: `${label.name.toLowerCase().replace(/\s+/g, '')}@local.db`,
+                vec: label.vec
+              })
+            });
+            if (res.ok) success++; else failed++;
+          } catch (e) {
+            failed++;
+            log('Upload error:', e);
+          }
+        }
 
-              if(enrolling){
-                addInPlace(enrollSum,desc); enrollLeft--; statusEl.textContent=`Enroll "${nameEl.value.trim()}" — tersisa ${enrollLeft}`;
-                if(enrollLeft<=0){
-                  scaleInPlace(enrollSum,1/parseInt(samplesEl.value,10));
-                  const db=loadDB(); db.labels=db.labels.filter(x=>x.name===nameEl.value.trim()?false:true); db.labels.push({name:nameEl.value.trim(), vec:Array.from(enrollSum)}); saveDB(db);
-                  enrolling=false; statusEl.textContent=`Enroll selesai untuk "${nameEl.value.trim()}".`;
+        log(`Upload selesai: ${success} berhasil, ${failed} gagal.`);
+        alert(`Upload selesai!\nBerhasil: ${success}\nGagal: ${failed}`);
+      } catch (e) {
+        log('Sync upload error:', e);
+        alert('Gagal upload: ' + e.message);
+      }
+    }
+
+    async function syncDownloadFromCloud() {
+      const baseUrl = (workerUrlEl.value || '').replace(/\/+$/, '');
+      const apiKey = workerKeyEl.value || '';
+      if (!baseUrl) { alert('Isi URL Worker terlebih dahulu.'); return; }
+      if (!apiKey) { alert('Isi API Key Worker terlebih dahulu.'); return; }
+
+      try {
+        log('Downloading from cloud...');
+        const res = await fetch(`${baseUrl}?api_key=${encodeURIComponent(apiKey)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const users = await res.json();
+        if (!Array.isArray(users)) throw new Error('Invalid response format');
+
+        const db = { labels: [] };
+        let skipped = 0;
+        for (const user of users) {
+          // Filter: hanya ambil yang punya vec valid
+          if (user.vec && Array.isArray(user.vec) && user.vec.length > 0) {
+            db.labels.push({
+              name: user.name,
+              vec: user.vec
+            });
+          } else {
+            skipped++;
+          }
+        }
+
+        saveDB(db);
+        log(`Download selesai: ${db.labels.length} user(s) dari cloud (${skipped} skipped).`);
+        alert(`Download selesai!\nBerhasil: ${db.labels.length} user(s)\nSkipped (no vec): ${skipped}`);
+      } catch (e) {
+        log('Sync download error:', e);
+        alert('Gagal download: ' + e.message);
+      }
+    }
+
+    btnSyncUpload.onclick = () => syncUploadToCloud();
+    btnSyncDownload.onclick = () => syncDownloadFromCloud();
+
+    // ===== Main loop (detect+recognize+trigger)
+    function startLoop() {
+      rgba && rgba.delete(); gray && gray.delete();
+      rgba = new cv.Mat(canvas.height, canvas.width, cv.CV_8UC4);
+      gray = new cv.Mat();
+      const faces = new cv.RectVector();
+      procFPS = 0; lastFPS = performance.now(); procCount = 0; frameIndex = 0;
+
+      const step = () => {
+        if (!running) {
+          rgba.delete();
+          gray.delete();
+          faces.delete();
+          return;
+        }
+
+        if (video.readyState >= 2 && video.videoWidth > 0) {
+          try {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            frameIndex++;
+            if (frameIndex % detectEveryN === 0) {
+              const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              rgba.data.set(data.data);
+              cv.cvtColor(rgba, gray, cv.COLOR_RGBA2GRAY);
+              cv.equalizeHist(gray, gray);
+              classifier.detectMultiScale(gray, faces, 1.1, 5, 0, new cv.Size(60, 60));
+              facesCount = faces.size();
+
+              let displayText = '';
+              if (faces.size() > 0) {
+                // pilih wajah terbesar
+                let bi = 0, ba = 0;
+                for (let i = 0; i < faces.size(); i++) { const r = faces.get(i), a = r.width * r.height; if (a > ba) { ba = a; bi = i; } }
+                const r = faces.get(bi);
+                // ROI -> 100x100
+                let roi = gray.roi(r), res = new cv.Mat();
+                cv.resize(roi, res, new cv.Size(LBP_SIZE, LBP_SIZE), 0, 0, cv.INTER_AREA);
+                const desc = lbpHistFromBytes(res.data, res.cols, res.rows);
+
+                if (enrolling) {
+                  addInPlace(enrollSum, desc); enrollLeft--; statusEl.textContent = `Enroll "${nameEl.value.trim()}" — tersisa ${enrollLeft}`;
+                  if (enrollLeft <= 0) {
+                    scaleInPlace(enrollSum, 1 / parseInt(samplesEl.value, 10));
+                    const db = loadDB(); db.labels = db.labels.filter(x => x.name === nameEl.value.trim() ? false : true); db.labels.push({ name: nameEl.value.trim(), vec: Array.from(enrollSum) }); saveDB(db);
+                    enrolling = false; statusEl.textContent = `Enroll selesai untuk "${nameEl.value.trim()}".`;
+                  }
+                } else {
+                  const db = loadDB(); const match = bestMatch(desc, db); const thr = parseFloat(thEl.value) || 0.9;
+                  if (match.score >= thr) { displayText = `${match.name} (${match.score.toFixed(2)})`; triggerOnVerified(); }
+                  else { displayText = `Unknown (${match.score.toFixed(2)})`; }
                 }
-              }else{
-                const db=loadDB(); const match=bestMatch(desc,db); const thr=parseFloat(thEl.value)||0.9;
-                if(match.score>=thr){ displayText=`${match.name} (${match.score.toFixed(2)})`; triggerOnVerified(); }
-                else { displayText=`Unknown (${match.score.toFixed(2)})`; }
+
+                // draw faces
+                ctx.lineWidth = Math.max(2, Math.round(canvas.width / 200));
+                for (let i = 0; i < faces.size(); i++) { const rr = faces.get(i); ctx.strokeStyle = i === bi ? '#00ff66' : '#66a3ff'; ctx.strokeRect(rr.x, rr.y, rr.width, rr.height); }
+                if (displayText) { const rr = faces.get(bi); ctx.fillStyle = 'rgba(0,0,0,.5)'; const w = ctx.measureText(displayText).width + 14; ctx.fillRect(rr.x, rr.y - 22, w, 20); ctx.fillStyle = '#fff'; ctx.fillText(displayText, rr.x + 7, rr.y - 7); }
+                roi.delete(); res.delete();
               }
 
-              // draw faces
-              ctx.lineWidth=Math.max(2,Math.round(canvas.width/200));
-              for(let i=0;i<faces.size();i++){ const rr=faces.get(i); ctx.strokeStyle=i===bi?'#00ff66':'#66a3ff'; ctx.strokeRect(rr.x,rr.y,rr.width,rr.height); }
-              if(displayText){ const rr=faces.get(bi); ctx.fillStyle='rgba(0,0,0,.5)'; const w=ctx.measureText(displayText).width+14; ctx.fillRect(rr.x, rr.y-22, w, 20); ctx.fillStyle='#fff'; ctx.fillText(displayText, rr.x+7, rr.y-7); }
-              roi.delete(); res.delete();
+              // FPS
+              procCount++; const now = performance.now(); if (now - lastFPS > 1000) { procFPS = procCount / ((now - lastFPS) / 1000); procCount = 0; lastFPS = now; }
             }
+          } catch (e) { log(e); }
+        }
 
-            // FPS
-            procCount++; const now=performance.now(); if(now-lastFPS>1000){ procFPS=procCount/((now-lastFPS)/1000); procCount=0; lastFPS=now; }
-          }
-        }catch(e){ log(e); }
-      }
+        drawHUD();
+        schedule();
+      };
 
-      drawHUD();
+      const schedule = () => { if ("requestVideoFrameCallback" in HTMLVideoElement.prototype) { video.requestVideoFrameCallback(() => { step(); }); } else { rafId = requestAnimationFrame(step); } };
       schedule();
-    };
+    }
 
-    const schedule=()=>{ if("requestVideoFrameCallback" in HTMLVideoElement.prototype){ video.requestVideoFrameCallback(()=>{ step(); }); } else { rafId=requestAnimationFrame(step); } };
-    schedule();
-  }
+    function drawHUD() {
+      const pad = 10, line = 18; const t1 = `FPS: ${Math.round(procFPS)}`, t2 = `Faces: ${facesCount}`, t3 = enrolling ? `Enrolling: ${nameEl.value.trim()} (${enrollLeft} left)` : '';
+      ctx.save(); ctx.font = '14px system-ui,Segoe UI,Roboto,Arial';
+      const w = Math.max(ctx.measureText(t1).width, ctx.measureText(t2).width, ctx.measureText(t3).width) + pad * 2; const lines = enrolling ? 3 : 2; const h = lines * line + pad * 2;
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(pad, pad, w, h);
+      ctx.fillStyle = '#e6eef6'; ctx.fillText(t1, pad * 2, pad + line); ctx.fillText(t2, pad * 2, pad + line * 2); if (enrolling) ctx.fillText(t3, pad * 2, pad + line * 3);
+      ctx.restore();
+    }
 
-  function drawHUD(){
-    const pad=10,line=18; const t1=`FPS: ${Math.round(procFPS)}`, t2=`Faces: ${facesCount}`, t3=enrolling?`Enrolling: ${nameEl.value.trim()} (${enrollLeft} left)`:'';
-    ctx.save(); ctx.font='14px system-ui,Segoe UI,Roboto,Arial';
-    const w=Math.max(ctx.measureText(t1).width,ctx.measureText(t2).width,ctx.measureText(t3).width)+pad*2; const lines=enrolling?3:2; const h=lines*line+pad*2;
-    ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(pad,pad,w,h);
-    ctx.fillStyle='#e6eef6'; ctx.fillText(t1,pad*2,pad+line); ctx.fillText(t2,pad*2,pad+line*2); if(enrolling) ctx.fillText(t3,pad*2,pad+line*3);
-    ctx.restore();
-  }
-
-  if(navigator.mediaDevices?.enumerateDevices) fillCameraList().catch(()=>{});
+    if (navigator.mediaDevices?.enumerateDevices) fillCameraList().catch(() => { });
   </script>
 </body>
+
 </html>

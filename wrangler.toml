@@ -1,0 +1,20 @@
+name = "face-recognition-api"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "face-recognition-db"
+database_id = "YOUR_D1_DATABASE_ID_HERE"
+
+[[kv_namespaces]]
+binding = "KV_FACES"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+
+[triggers]
+crons = ["0 */12 * * *"] # Cleanup setiap 12 jam
+
+[vars]
+API_KEY = "rahasiaku123"
+ALLOWED_ORIGINS = "http://localhost:5500,http://127.0.0.1:5500,http://localhost:3000"
